@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas</title>
+    <style type ="text/css">
+        canvas {
+            border: 1px solid black;
+        }
+        body{
+            margin: 0
+        }
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+    <script>
+        const canvas=document.querySelector("canvas");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+const c=canvas.getContext("2d");
+//botoes
+let tela="menu",modo="";
+let botaoSingle={x:canvas.width/2-140,y:canvas.height/2-80,largura:280,altura:60};
+let botaoMulti={x:canvas.width/2-140,y:canvas.height/2+10,largura:280,altura:60};
+//variaveis do jogo
+let bolas=[{x:100,y:80,raio:25,vx:2.5,vy:1.5,gravidade:.18,esperando:false,contador:0}];
+let barra={x:canvas.width/2-75,y:canvas.height-80,largura:150,altura:12,velocidade:12};
+let barra2={x:canvas.width/2-75,y:80,largura:150,altura:12,velocidade:12};
+let teclas={},inicio=Date.now(),jogoAcabou=false,quiques=0,reiniciando=false;
+//nao mexer a tela
+window.addEventListener("keydown",function(event){
+    if(event.key=="ArrowLeft"||event.key=="ArrowRight")event.preventDefault();
+    teclas[event.key.toLowerCase()]=true;
+});
+
+window.addEventListener("keyup",function(event){
+    teclas[event.key.toLowerCase()]=false;
+});
+
+canvas.addEventListener("click",function(e){
+
+    if(tela!="menu")return;
+    let rect=canvas.getBoundingClientRect();
+    let mouseX=e.clientX-rect.left;
+    let mouseY=e.clientY-rect.top;
+//botao single selecionado
+    if(mouseX>=botaoSingle.x&&mouseX<=botaoSingle.x+botaoSingle.largura&&mouseY>=botaoSingle.y&&mouseY<=botaoSingle.y+botaoSingle.altura){
+        modo="singleplayer";
+        iniciarSingleplayer();
+    }
+// botao multi selecionado
+    if(mouseX>=botaoMulti.x&&mouseX<=botaoMulti.x+botaoMulti.largura&&mouseY>=botaoMulti.y&&mouseY<=botaoMulti.y+botaoMulti.altura){
+        modo="multiplayer";
+        iniciarMultiplayer();
+    }
+});
+//definição, criação e inicio de coisas do single
+function iniciarSingleplayer(){
+    tela="jogo";
+    teclas={};
+    bolas=[{x:100,y:80,raio:25,vx:2.5,vy:1.5,gravidade:.22,esperando:false,contador:0}];
+    barra.x=canvas.width/2-75;
+    barra.y=canvas.height-80;
+    inicio=Date.now();
+    jogoAcabou=false;
+    quiques=0;
+    reiniciando=false;
+}
+//definição, criação e inicio de coisas do multi
+function iniciarMultiplayer(){
+    tela="jogo";
+    teclas={};
+    bolas=[{x:canvas.width/2,y:canvas.height/2,raio:25,vx:4,vy:2,gravidade:0,esperando:false,contador:0}];
+    barra.x=canvas.width/2-75;
+    barra.y=canvas.height-80;
+    barra2.x=canvas.width/2-75;
+    barra2.y=80;
+    inicio=Date.now();
+    jogoAcabou=false;
+    quiques=0;
+    reiniciando=false;
+}
+//layout menu
+function desenharMenu(){
+    c.clearRect(0,0,canvas.width,canvas.height);
+    c.fillStyle="#eeeeee";
+    c.fillRect(0,0,canvas.width,canvas.height);
+
+    c.fillStyle="black";
+    c.font="45px Arial";
+    c.fillText("Escolha o modo",canvas.width/2-160,canvas.height/2-140);
+
+    c.fillStyle="green";
+    c.fillRect(botaoSingle.x,botaoSingle.y,botaoSingle.largura,botaoSingle.altura);
+    c.fillStyle="white";
+    c.font="28px Arial";
+    c.fillText("Singleplayer",botaoSingle.x+55,botaoSingle.y+40);
+
+    c.fillStyle="blue";
+    c.fillRect(botaoMulti.x,botaoMulti.y,botaoMulti.largura,botaoMulti.altura);
+    c.fillStyle="white";
+    c.fillText("Multiplayer",botaoMulti.x+65,botaoMulti.y+40);
+}
+//função que adiciona uma bola
+function reiniciarTodasAsBolas(){
+    reiniciando=true;
+    bolas.push({x:100+bolas.length*80,y:80,raio:25,vx:2.5,vy:0,gravidade:.18,esperando:true,contador:180});
+
+    for(let i=0;i<bolas.length;i++){
+        bolas[i].x=100+i*90;
+        if(bolas[i].x>canvas.width-80)bolas[i].x=Math.random()*(canvas.width-100)+50;
+        bolas[i].y=80;
+        bolas[i].vx=2.5+i*.4;
+        bolas[i].vy=0;
+        bolas[i].esperando=true;
+        bolas[i].contador=120+i*90;
+    }
+}
+//função que desenha as bolas e as faz esperar para poder sair
+function desenharBola(bola){
+    c.beginPath();
+    c.arc(bola.x,bola.y,bola.raio,0,Math.PI*2);
+    c.fillStyle=bola.esperando?"red":"blue";
+    c.fill();
+    c.closePath();
+
+    if(bola.esperando){
+        c.fillStyle="black";
+        c.font="22px Arial";
+        c.fillText(Math.ceil(bola.contador/60),bola.x-7,bola.y+7);
+    }
+}
+// função para desenhar a barra no single
+function desenharBarra(){
+    c.fillStyle="green";
+    c.fillRect(barra.x,barra.y,barra.largura,barra.altura);
+
+    if(modo=="multiplayer"){
+        c.fillStyle="purple";
+        c.fillRect(barra2.x,barra2.y,barra2.largura,barra2.altura);
+    }
+}
+//função para mover a barra no single
+function moverBarra(){
+    if(modo=="singleplayer"){
+        if(teclas.arrowleft||teclas.a)barra.x-=barra.velocidade;
+        if(teclas.arrowright||teclas.d)barra.x+=barra.velocidade;
+    }
+//função para mover a barra no multi
+    if(modo=="multiplayer"){
+        if(teclas.a)barra.x-=barra.velocidade;
+        if(teclas.d)barra.x+=barra.velocidade;
+        if(teclas.arrowleft)barra2.x-=barra2.velocidade;
+        if(teclas.arrowright)barra2.x+=barra2.velocidade;
+    }
+
+    if(barra.x<0)barra.x=0;
+    if(barra.x+barra.largura>canvas.width)barra.x=canvas.width-barra.largura;
+
+    if(barra2.x<0)barra2.x=0;
+    if(barra2.x+barra2.largura>canvas.width)barra2.x=canvas.width-barra2.largura;
+}
+//função para reiniciar as bolas
+function atualizarBola(bola){
+    //multi
+    if(modo=="multiplayer"){
+        atualizarBolaMultiplayer(bola);
+        return;
+    }
+//single
+    if(bola.esperando){
+        bola.contador--;
+        if(bola.contador<=0){
+            bola.esperando=false;
+            bola.vy=1.5;
+            if(bola.vx===0)bola.vx=2.5;
+        }
+        return;
+    }
+//gravidade e funções single
+    bola.vy+=bola.gravidade;
+    bola.x+=bola.vx;
+    bola.y+=bola.vy;
+
+    if(bola.x+bola.raio>canvas.width){
+        bola.x=canvas.width-bola.raio;
+        bola.vx*=-1;
+    }
+//bola bateu na parede
+    if(bola.x-bola.raio<0){
+        bola.x=bola.raio;
+        bola.vx*=-1;
+    }
+    //bola bateu na barra
+    if(bola.y+bola.raio>=barra.y&&bola.y-bola.raio<=barra.y+barra.altura&&bola.x+bola.raio>=barra.x&&bola.x-bola.raio<=barra.x+barra.largura&&bola.vy>0){
+        bola.y=barra.y-bola.raio;
+        bola.vy=-13;
+
+        let centroBarra=barra.x+barra.largura/2;
+        let distanciaCentro=bola.x-centroBarra;
+        bola.vx=distanciaCentro*.04;
+
+        if(bola.vx>-2&&bola.vx<2)bola.vx=bola.vx<0?-2:2;
+
+        quiques++;
+
+        if(quiques%5===0&&!reiniciando)reiniciarTodasAsBolas();
+    }
+
+    if(bola.y-bola.raio>canvas.height){
+        jogoAcabou=true;
+        teclas={};
+        let tempo=((Date.now()-inicio)/1000).toFixed(1);
+        alert("Você perdeu!\n"+"Tempo: "+tempo+" segundos\n"+"Quiques: "+quiques);
+        tela="menu";
+        jogoAcabou=false;
+    }
+}
+//acelerar bola e funções multi
+function acelerarBola(bola){
+    bola.vx*=2;
+    bola.vy*=2;
+}
+//bola andando na tela
+function atualizarBolaMultiplayer(bola){
+    bola.x+=bola.vx;
+    bola.y+=bola.vy;
+//bola bateu na parede
+    if(bola.x+bola.raio>canvas.width){
+        bola.x=canvas.width-bola.raio;
+        bola.vx*=-1;
+    }
+
+    if(bola.x-bola.raio<0){
+        bola.x=bola.raio;
+        bola.vx*=-1;
+    }
+//bola bateu na barra
+    if(bola.y+bola.raio>=barra.y&&bola.y-bola.raio<=barra.y+barra.altura&&bola.x+bola.raio>=barra.x&&bola.x-bola.raio<=barra.x+barra.largura&&bola.vy>0){
+        bola.y=barra.y-bola.raio;
+        bola.vy=-5;
+
+        let centroBarra=barra.x+barra.largura/2;
+        let distanciaCentro=bola.x-centroBarra;
+        bola.vx=distanciaCentro*.05;
+        if(bola.vx>-2&&bola.vx<2)bola.vx=bola.vx<0?-2:2;
+
+        quiques++;
+        acelerarBola(bola);
+    }
+//bola bateu na barra 2
+    if(bola.y-bola.raio<=barra2.y+barra2.altura&&bola.y+bola.raio>=barra2.y&&bola.x+bola.raio>=barra2.x&&bola.x-bola.raio<=barra2.x+barra2.largura&&bola.vy<0){
+        bola.y=barra2.y+barra2.altura+bola.raio;
+        bola.vy=5;
+
+        let centroBarra=barra2.x+barra2.largura/2;
+        let distanciaCentro=bola.x-centroBarra;
+        bola.vx=distanciaCentro*.05;
+        if(bola.vx>-2&&bola.vx<2)bola.vx=bola.vx<0?-2:2;
+
+        quiques++;
+        acelerarBola(bola);
+    }
+//bola bateu no chão ou no teto
+    if(bola.y-bola.raio>canvas.height){
+        jogoAcabou=true;
+        teclas={};
+        alert("Player 2 venceu!");
+        tela="menu";
+        jogoAcabou=false;
+    }
+
+    if(bola.y+bola.raio<0){
+        jogoAcabou=true;
+        teclas={};
+        alert("Player 1 venceu!");
+        tela="menu";
+        jogoAcabou=false;
+    }
+}
+//função para verificar se as bolas ja sairam ou não
+function verificarReinicio(){
+    if(modo=="multiplayer")return;
+
+    let algumaEsperando=false;
+    for(let i=0;i<bolas.length;i++)if(bolas[i].esperando)algumaEsperando=true;
+    if(!algumaEsperando)reiniciando=false;
+}
+
+function mostrarInformacoes(){
+    let tempo=((Date.now()-inicio)/1000).toFixed(1);
+
+    c.fillStyle="black";
+    c.font="20px Arial";
+
+    if(modo=="singleplayer"){
+        c.fillText("Tempo: "+tempo+"s",20,30);
+        c.fillText("Quiques: "+quiques,20,60);
+        c.fillText("Bolas: "+bolas.length,20,90);
+    }
+
+    if(modo=="multiplayer"){
+        c.fillText("Modo: Multiplayer",20,30);
+        c.fillText("Quiques: "+quiques,20,60);
+        c.fillText("Player 1: A/D",20,90);
+        c.fillText("Player 2: ←/→",20,120);
+    }
+}
+
+function animate(){
+    if(tela=="menu"){
+        desenharMenu();
+        requestAnimationFrame(animate);
+        return;
+    }
+
+    if(jogoAcabou)return;
+
+    c.clearRect(0,0,canvas.width,canvas.height);
+
+    moverBarra();
+
+    for(let i=0;i<bolas.length;i++){
+        atualizarBola(bolas[i]);
+        desenharBola(bolas[i]);
+    }
+
+    verificarReinicio();
+    desenharBarra();
+    mostrarInformacoes();
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+    </script>
+</body>
+</html>
