@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Post 1</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff512f, #dd2476);
+      color: white;
+    }
+
+    .caixa {
+      text-align: center;
+      padding: 50px;
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      font-size: 55px;
+      letter-spacing: 3px;
+      animation: aparecer 1.5s ease;
+    }
+
+    p {
+      font-size: 20px;
+    }
+
+    @keyframes aparecer {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .botao {
+      margin-top: 25px;
+      padding: 12px 28px;
+      border-radius: 30px;
+      border: none;
+      background: white;
+      color: #dd2476;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .botao:hover {
+      transform: scale(1.08);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="caixa">
+    <h1>BEM-VINDO AO POST1</h1>
+    <p>Essa é uma página criativa e personalizada.</p>
+    <button class="botao">Continuar</button>
+  </div>
+
+</body>
+</html>

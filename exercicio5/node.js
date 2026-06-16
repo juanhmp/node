@@ -15,32 +15,25 @@ const server = http.createServer((req, res) => {
       res.end(data);
     }
   });
-}else if(req.url === '/contato' ){
-  res.statusCode = 100;
+}else if(req.url === '/login' ){
+  res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
-  res.end('Para contato, utilize o e-mail: lualeomen@gmail.com.(Codigo 100: Informações)');
-}else if(req.url === '/redirecionamento'){
-  res.statusCode = 300;
+  res.end('200--"Login realizado com sucesso!"');
+}else if(req.url === '/dashboard' ){
+  res.statusCode = 401;
   res.setHeader('Content-Type', 'text/plain');
-  res.end('Redirecionando a outra pagina...(Codigo 300: Redirecionamento)');
+  res.end('401--"Acesso negado. Faça login primeiro."');
+}else if(req.url === '/admin' ){
+  res.statusCode = 403;
+  res.setHeader('Content-Type', 'text/plain');
+  res.end('403--"Você não tem permissão para acessar esta área."');
 }else{
-  const filePath = path.join(__dirname, '404.html');
-
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
         res.statusCode = 404;
         res.setHeader('Content-Type', 'text/plain');
-        res.end('Erro 404: Página não encontrada.');
-      } else {
-        res.statusCode = 404;
-        res.setHeader('Content-Type', 'text/html');
-        res.end(data);
-      }
-    });
-  }
-});
+        res.end('404--"Página não encontrada."');
+    }});
 
-const port = 3000;
+const port = 2000;
 server.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}/`);
 });
