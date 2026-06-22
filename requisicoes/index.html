@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Enviar número</title>
+</head>
+<body>
+
+    <h1>Enviar número para o Node.js</h1>
+
+    <input type="number" id="numero" placeholder="Digite um número">
+    <button onclick="enviarNumero()">Enviar</button>
+
+    <script>
+        function enviarNumero() {
+            const numero = document.getElementById("numero").value;
+
+            window.location.href = `/numero?numero=${numero}`;
+        }
+    </script>
+
+</body>
+</html>
