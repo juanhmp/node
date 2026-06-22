@@ -20,11 +20,11 @@ const server = http.createServer((req, res) => {
 
     fs.readFile(filePath, (err, data) => {
       if (err) {
-        res.statusCode = 404;
+        res.statusCode = 500;
         res.setHeader('Content-Type', 'text/plain');
-        res.end('Erro 404: Página não encontrada.');
+        res.end('Erro 500: Erro no Servidor.');
       } else {
-        res.statusCode = 404;
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'text/html');
         res.end(data);
       }
@@ -34,11 +34,11 @@ const server = http.createServer((req, res) => {
 
     fs.readFile(filePath, (err, data) => {
       if (err) {
-        res.statusCode = 404;
+        res.statusCode = 500;
         res.setHeader('Content-Type', 'text/plain');
-        res.end('Erro 404: Página não encontrada.');
+        res.end('Erro 500: Erro no Servidor.');
       } else {
-        res.statusCode = 404;
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'text/html');
         res.end(data);
       }
@@ -48,11 +48,11 @@ const server = http.createServer((req, res) => {
 
     fs.readFile(filePath, (err, data) => {
       if (err) {
-        res.statusCode = 404;
+        res.statusCode = 500;
         res.setHeader('Content-Type', 'text/plain');
-        res.end('Erro 404: Página não encontrada.');
+        res.end('Erro 500: Erro no Servidor.');
       } else {
-        res.statusCode = 404;
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'text/html');
         res.end(data);
       }
