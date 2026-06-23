@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+var numeroAleatorio = Math.floor(Math.random()*100);
 const server = http.createServer((req, res) => {
     const urlParams = new URL(req.url, `http://localhost:3000`);
     const endpoint = urlParams.pathname;
@@ -82,10 +83,16 @@ const server = http.createServer((req, res) => {
         }
     }else if(endpoint === '/guess'){
     const numero = urlParams.searchParams.get('numero');
-
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-
-    res.end(`O numero recebido foi: ${numero}`);
+    res.writeHead(200, { 'Content-Type': 'text/plain' });   
+    if(numero < numeroAleatorio){
+      res.end(`O numero recebido foi: ${numero} e e menor que o número aleatório gerado aqui.`);
+    }
+    else if(numero > numeroAleatorio){
+      res.end(`O numero recebido foi: ${numero} e e maior que o número aleatório gerado aqui.`);
+    }
+    else{
+      res.end(`O numero recebido foi: ${numero} e e igual ao número aleatório gerado aqui.`);
+    }
     }else{
       const filePath = path.join(__dirname, '404.html');
     
@@ -99,7 +106,7 @@ const server = http.createServer((req, res) => {
             res.setHeader('Content-Type', 'text/html');
             res.end(data);
           }
-        });
+        })
       }
     });
     
